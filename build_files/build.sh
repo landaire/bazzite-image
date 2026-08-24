@@ -26,5 +26,19 @@ cp -avf "/ctx/system_files"/. /
 
 #systemctl enable podman.socket
 
+### Helium browser (Chromium fork) from the upstream COPR.
+# Baked in so it no longer needs rpm-ostree layering on the host, which would
+# otherwise block `bootc upgrade`.
+# helium-bin unpacks into /opt/helium. On ublue images /opt is a symlink to
+# /var/opt (empty at build time), so the rpm unpack fails to create the dir.
+# Replace it with a real directory, making /opt image-immutable.
+if [ -L /opt ]; then
+  rm /opt
+  mkdir /opt
+fi
+dnf5 -y copr enable imput/helium
+dnf5 -y install helium-bin
+dnf5 -y copr disable imput/helium
+
 ### nix Mountpoint
 mkdir -p /nix
