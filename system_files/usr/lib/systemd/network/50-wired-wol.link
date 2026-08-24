@@ -1,0 +1,9 @@
+# Arm Wake-on-LAN (magic packet) on the wired NIC so the machine can be woken
+# from suspend over SSH. Matches the Intel igc driver rather than a name/MAC so
+# it survives interface renames. Requires "Wake on LAN" enabled and ErP/Deep
+# Sleep disabled in firmware.
+[Match]
+Driver=igc
+
+[Link]
+WakeOnLan=magic
