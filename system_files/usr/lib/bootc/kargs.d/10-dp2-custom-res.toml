@@ -1,0 +1,8 @@
+# Dell AW3423DW (DP-2) custom resolutions.
+# The panel is native 3440x1440 (21:9) and its EDID advertises no 16:9 modes.
+# This EDID override (system_files/usr/lib/firmware/edid/dp2.edid) adds
+# 2560x1440 and 1920x1080 at 60/120 Hz while preserving every native 3440x1440
+# mode, so the ultrawide can run 16:9 for a bar-free mirror to the Elgato.
+# 144 Hz at 2560x1440 is intentionally omitted: the monitor's non-native scaler
+# rejects the 604 MHz timing (black screen). 120 Hz (497 MHz) is the max that works.
+kargs = ["drm.edid_firmware=DP-2:edid/dp2.edid"]
