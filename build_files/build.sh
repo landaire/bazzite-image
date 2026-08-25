@@ -36,9 +36,14 @@ if [ -L /opt ]; then
   rm /opt
   mkdir /opt
 fi
+
 dnf5 -y copr enable imput/helium
 dnf5 -y install helium-bin
 dnf5 -y copr disable imput/helium
+
+dnf5 -y copr enable lizardbyte/stable
+dnf5 -y install Sunshine
+dnf5 -y copr disable lizardbyte/stable
 
 ### nix Mountpoint
 mkdir -p /nix
