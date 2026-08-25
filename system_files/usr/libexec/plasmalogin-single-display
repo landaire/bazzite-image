@@ -1,0 +1,27 @@
+#!/usr/bin/bash
+# Keep the login greeter on the Dell (DP-2) only.
+#
+# kwin enables every connected output at 0,0 extended, so the Elgato capture card
+# (HDMI-A-2) lands on top of the Dell and the greeter renders two overlapping views
+# (duplicate clocks, constant flicker, stuck input). kwin re-detects outputs on every
+# greeter start, so a saved output layout does not persist; disable the Elgato here.
+#
+# Runs as ExecStartPost of the greeter's kwin, after it claims org.kde.KWin. Outputs
+# may still be enumerating, so retry. Only act while DP-2 is present so the greeter
+# never loses its last output.
+set -u
+
+# DP-2 and HDMI-A-2 are different connectors and can enumerate on different ticks,
+# so HDMI-A-2 being absent now is never terminal: keep polling the whole window and
+# only exit early on a successful disable. Match the space-delimited connector token
+# so an MST child (DP-2-1) cannot false-match. A oneshot disables once per greeter
+# start; a later kwin re-probe within the same session would need another run.
+for _ in $(seq 1 40); do
+  outputs=$(kscreen-doctor -o 2>/dev/null) || { sleep 0.25; continue; }
+  printf '%s\n' "$outputs" | grep -q ' DP-2 ' || { sleep 0.25; continue; }
+  if printf '%s\n' "$outputs" | grep -q ' HDMI-A-2 '; then
+    kscreen-doctor output.HDMI-A-2.disable >/dev/null 2>&1 && exit 0
+  fi
+  sleep 0.25
+done
+exit 0

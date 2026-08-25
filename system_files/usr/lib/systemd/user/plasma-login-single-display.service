@@ -1,0 +1,21 @@
+# Keep the login greeter on the Dell (DP-2) only.
+#
+# The greeter enables every connected output at 0,0 extended, so the Elgato capture
+# card (HDMI-A-2) overlaps the Dell and the greeter renders two stacked views
+# (duplicate clocks, constant flicker, stuck input). kwin re-detects outputs on every
+# greeter start, so a saved layout does not persist; disable the Elgato each start.
+#
+# Runs after kwin claims org.kde.KWin, in parallel with the greeter so it never gates
+# startup. Failure leaves the greeter running (just with the overlap).
+[Unit]
+Description=Disable the Elgato output at the login greeter (single-display greeter)
+After=plasma-login-kwin_wayland.service
+PartOf=plasma-login-wayland.target
+
+[Service]
+Type=oneshot
+Environment=WAYLAND_DISPLAY=wayland-0
+ExecStart=/usr/libexec/plasmalogin-single-display
+
+[Install]
+WantedBy=plasma-login-wayland.target
