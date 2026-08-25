@@ -45,5 +45,19 @@ dnf5 -y copr enable lizardbyte/stable
 dnf5 -y install Sunshine
 dnf5 -y copr disable lizardbyte/stable
 
+### Remove waydroid. Doing it in the image is permanent and survives bootc
+# upgrades, unlike a host-side `rpm-ostree override remove` (which resets on
+# rebase and was not sticking). Guarded so a future base image without waydroid
+# does not abort the build under `set -e`.
+if rpm -q waydroid; then
+  dnf5 -y remove waydroid
+fi
+
+### Enable services in the image so hosts get them without host-side layering.
+# `systemctl enable` operates offline on the filesystem during the build. The
+# base ships these RPMs but leaves the daemons disabled.
+systemctl enable sshd.service
+systemctl enable tailscaled.service
+
 ### nix Mountpoint
 mkdir -p /nix
