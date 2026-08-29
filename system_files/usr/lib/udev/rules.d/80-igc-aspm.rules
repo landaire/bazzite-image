@@ -1,0 +1,7 @@
+# Disable PCIe L1 ASPM on the Intel I225-V (8086:15f3, igc).
+# With L1 ASPM enabled this controller intermittently drops its PCIe link
+# ("igc ... PCIe link lost, device now detached", igc_rd32 reads 0xffffffff),
+# which strands the wired network until a reboot. Matching by vendor:device
+# survives interface renames (eno1 -> eth0) and re-applies on every add, so it
+# also covers a manual PCI remove/rescan recovery.
+ACTION=="add", SUBSYSTEM=="pci", ATTRS{vendor}=="0x8086", ATTRS{device}=="0x15f3", ATTR{link/l1_aspm}="0"
