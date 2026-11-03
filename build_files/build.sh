@@ -45,6 +45,38 @@ dnf5 -y copr enable lizardbyte/stable
 dnf5 -y install Sunshine
 dnf5 -y copr disable lizardbyte/stable
 
+# Bazzite's Terra Xwayland package omits the architecture-qualified virtual
+# provide required by the Hyprland RPM even though it ships the same interface.
+dnf5 -y install rpm-build
+mkdir -p /tmp/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+rpmbuild -bb \
+  --define "_topdir /tmp/rpmbuild" \
+  /ctx/terra-xwayland-hyprland-compat.spec
+dnf5 -y install /tmp/rpmbuild/RPMS/x86_64/terra-xwayland-hyprland-compat-*.rpm
+dnf5 -y remove rpm-build
+
+# Fedora retired its Hyprland package. This focused COPR builds tagged upstream
+# releases without network access and follows Fedora release branches.
+dnf5 -y copr enable nikromen/hyprland
+dnf5 -y install \
+  blueman \
+  brightnessctl \
+  fuzzel \
+  grim \
+  hypridle \
+  hyprland \
+  hyprlock \
+  hyprpolkitagent \
+  mako \
+  network-manager-applet \
+  pavucontrol \
+  playerctl \
+  slurp \
+  waybar \
+  wl-clipboard \
+  xdg-desktop-portal-hyprland
+dnf5 -y copr disable nikromen/hyprland
+
 ### Remove waydroid. Doing it in the image is permanent and survives bootc
 # upgrades, unlike a host-side `rpm-ostree override remove` (which resets on
 # rebase and was not sticking). Guarded so a future base image without waydroid
